@@ -24,10 +24,3 @@
 /nbdist/
 /.nb-gradle/
 
-.classpath
-.project
-mvnw
-mvnw.cmd
-.mvn/
-.settings
-target
