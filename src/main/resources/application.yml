@@ -1,0 +1,28 @@
+#server
+server:
+  port: 8089
+  context-path: /
+  jsp-servlet:
+    init-parameters: 
+      development: true
+
+#mybatis
+mybatis:
+  check-config-location: true
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: classpath:mybatis/mappers/*Mapper.xml
+  type-aliases-package: cn.jbinfo.order.model
+  
+#druid
+spring:
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true&amp;allowMultiQueries=true&amp;useSSL=false
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.jdbc.Driver
+
+
