@@ -1,15 +1,278 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.jbinfo.order.mapper.UserMapper">
-    <insert id="add" useGeneratedKeys="true" keyProperty="id">
-        insert into t_user(username, password, age) values (#{username},#{password},#{age})
-    </insert>
-
-    <select id="selectById" parameterType="string" resultType="com.jbinfo.order.model.User">
-        select * from t_user
-      <where>
-          id=#{id}
-      </where>
-    </select>
+	<!-- COLUMNS -->
+	<sql id="COLUMNS">
+	    <![CDATA[ 
+			user_.id ,
+			user_.username ,
+			user_.password ,
+			user_.age 
+	    ]]>
+	</sql>
+	
+	<sql id="NICK_NAME">
+		user_
+	</sql>
+	
+	<sql id="TABLE_NAME">
+		user
+	</sql>
+	
+	<sql id="TABLE">
+		<include refid="TABLE_NAME" /> <include refid="NICK_NAME" />
+	</sql>
+	
+	
+	<sql id="SELECT">
+		SELECT
+		<include refid="COLUMNS" />
+		FROM
+		<include refid="TABLE" />
+	</sql>
+	
+	<sql id="SELECT_COUNT">
+		SELECT
+		<include refid="COLUMNS" />
+		FROM
+		<include refid="TABLE" />
+	</sql>
+	
+	<!-- ENTITY_RESULT_MAP -->
+	<resultMap id="ENTITY_RESULT_MAP" type="com.jbinfo.order.model.User">
+        <result property="id" column="id"/> <!--  -->
+        <result property="username" column="username"/> <!--  -->
+        <result property="password" column="password"/> <!--  -->
+        <result property="age" column="age"/> <!--  -->
+	</resultMap>
+	
+	<!-- insert -->
+	<insert id="insert" parameterType="com.jbinfo.order.model.User" keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO user (
+        	username ,
+        	password ,
+        	age 
+        ) VALUES (
+        	#{username}  ,
+        	#{password}  ,
+        	#{age}  
+        )
+	</insert>
+	
+	<!-- insertBatch -->
+	<insert id="insertBatch" parameterType="com.jbinfo.order.model.User">
+		INSERT INTO user (
+        	id ,
+        	username ,
+        	password ,
+        	age 
+		)  values
+		<foreach collection="list" item="item" index="index"  
+        separator=",">
+        (
+       		#{item.id} ,
+       		#{item.username} ,
+       		#{item.password} ,
+       		#{item.age} 
+        )
+        </foreach>
+	</insert>
+	
+	<!-- deleteById -->
+	<delete id="deleteById" parameterType="String">
+		DELETE FROM 
+		<include refid="TABLE_NAME" /> 
+		<where>
+	        id = #{id} 
+		</where>
+	</delete>
+	
+	<!-- delete -->
+	<delete id="delete" parameterType="com.jbinfo.order.model.User">
+		DELETE FROM 
+		<include refid="TABLE_NAME" /> 
+		<where>
+	        <if test='username != null and username != ""'>
+	          AND username = #{username}
+	        </if> 
+	        <if test='password != null and password != ""'>
+	          AND password = #{password}
+	        </if> 
+	        <if test='age != null and age != ""'>
+	          AND age = #{age}
+	        </if> 
+		</where>
+	</delete>
+	
+	<!-- deleteByMap -->
+	<delete id="deleteByMap" parameterType="java.util.HashMap">
+		DELETE FROM 
+		<include refid="TABLE_NAME" /> 
+		<where>
+	        <if test='username != null and username != ""'>
+	         AND  username = #{username}
+	        </if> 
+	        <if test='password != null and password != ""'>
+	         AND  password = #{password}
+	        </if> 
+	        <if test='age != null and age != ""'>
+	         AND  age = #{age}
+	        </if> 
+		</where>
+	</delete>
+	
+	<!-- deleteBatchIds -->
+	<delete id="deleteBatchIds" parameterType="String">
+		DELETE FROM 
+		<include refid="TABLE_NAME" /> 
+		<where>
+		<include refid="TABLE_NAME" />.ID IN
+		<foreach item="item" collection="list" open="(" separator="," close=")">
+         #{item}
+        </foreach>
+		</where>
+	</delete>
+	
+	<update id="update"  parameterType="com.jbinfo.order.model.User">
+        UPDATE user
+        <set>
+	        <if test='username != null and username != ""'>
+		    username = #{username},   
+	        </if>
+	        <if test='password != null and password != ""'>
+		    password = #{password},   
+	        </if>
+	        <if test='age != null'>
+		    age = #{age}   
+	        </if>
+	    </set>
+        <where> 
+	        id = #{id} 
+	    </where>    	        
+	</update>
+	
+	<!-- updateBatchIds -->
+	<update id="updateBatchIds" parameterType="com.jbinfo.order.model.User">
+		  <foreach collection="list" item="item" index="index" open="" close="" separator=";">
+	     	UPDATE user
+        	<set>
+		        <if test='item.username != null and item.username != ""'>
+			    username = #{item.username},   
+		        </if>
+		        <if test='item.password != null and item.password != ""'>
+			    password = #{item.password},   
+		        </if>
+		        <if test='item.age != null '>
+			    age = #{item.age}   
+		        </if>
+        	</set>
+        	<where> 
+		        id = #{item.id} 
+		    </where>
+    	</foreach>
+	</update>
+	
+	<!-- selectById-->
+	<select id="selectById" resultMap="ENTITY_RESULT_MAP" parameterType="String">
+		<include refid="SELECT" />
+		<where>
+	         user_.id = #{id} 
+		</where>
+	</select>
+	
+	<select id="selectOne" resultMap="ENTITY_RESULT_MAP" parameterType="com.jbinfo.order.model.User">
+		<include refid="SELECT" />
+		<where>
+			<if test='id != null and id != ""'>
+	       	 	user_.id = #{id}
+	        </if>
+			<if test='username != null and username != ""'>
+				AND user_.username = #{username} 
+			</if>
+			<if test='password != null and password != ""'>
+				AND user_.password = #{password} 
+			</if>
+			<if test='age != null and age != ""'>
+				AND user_.age = #{age} 
+			</if>
+		</where>
+	</select>
+	
+	<!-- selectList -->
+	<select id="selectList" resultMap="ENTITY_RESULT_MAP">
+		<include refid="SELECT" />
+		<where>
+			<if test='id != null and id != ""'>
+	       	 	user_.id = #{id}
+	        </if>
+			<if test='username != null and username != ""'>
+				and user_.username=#{username}
+			</if>
+			<if test='password != null and password != ""'>
+				and user_.password=#{password}
+			</if>
+			<if test='age != null and age != ""'>
+				and user_.age=#{age}
+			</if>
+		</where>
+	</select>
+	
+	<!-- selectBatchIds -->
+	<select id="selectBatchIds" parameterType="String" resultMap="ENTITY_RESULT_MAP">
+		<include refid="SELECT" /> 
+		<where>
+		<include refid="NICK_NAME" />.ID IN
+		<foreach item="item" collection="list" open="(" separator="," close=")">
+         #{item}
+        </foreach>
+		</where>
+	</select>
+	
+	<!-- selectByMap -->
+	<select id="selectByMap" parameterType="java.util.HashMap" resultMap="ENTITY_RESULT_MAP">
+	
+	</select>
+	
+	<!-- selectCount -->
+	<select id="selectCount" parameterType="com.jbinfo.order.model.User" resultType="long">
+		<include refid="SELECT_COUNT" />
+		<where>
+			<if test='id != null and id != ""'>
+	       	 	user_.id = #{id}
+	        </if>
+			<if test='username != null and username != ""'>
+				and user_.username=#{username}
+			</if>
+			<if test='password != null and password != ""'>
+				and user_.password=#{password}
+			</if>
+			<if test='age != null and age != ""'>
+				and user_.age=#{age}
+			</if>
+		</where>
+	</select>
+	
+	<!-- queryPage -->
+	<select id="queryPage" resultMap="ENTITY_RESULT_MAP" parameterType="java.util.HashMap">
+		<include refid="SELECT" />
+		<where>
+			<if test='id != null and id != ""'>
+	       	 	user_.id = #{id}
+	        </if>
+			<if test='o.username != null and o.username != ""'>
+				and user_.username='${o.username}'
+			</if>
+			<if test='o.password != null and o.password != ""'>
+				and user_.password='${o.password}'
+			</if>
+			<if test='o.age != null and o.age != ""'>
+				and user_.age='${o.age}'
+			</if>
+		</where>
+		<choose>
+			<when test='pager.orderBy == "" or pager.orderBy ==null '>order by user_.CREATE_DATE DESC</when>
+			<when test='pager.orderBy != "" and pager.orderBy !=null '>order by user_.${pager.orderBy}</when>
+		</choose>
+	</select>
 
 </mapper>
